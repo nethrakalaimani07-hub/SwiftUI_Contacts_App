@@ -54,10 +54,7 @@ struct EditContactView: View {
     }
 
     private var initialsPreview: String {
-        let initials = "\(firstName.first ?? " ")\(lastName.first ?? " ")"
-                .trimmingCharacters(in: .whitespaces)
-                .uppercased()
-
+        let initials = String.contactInitials(firstName: firstName, lastName: lastName)
         return initials.isEmpty ? "?" : initials
     }
 
@@ -271,7 +268,7 @@ struct EditContactView: View {
     private func saveChanges() {
         guard validate() else { return }
 
-        var updatedContact = contact
+        let updatedContact = contact
         updatedContact.firstName = firstName
         updatedContact.lastName = lastName.isEmpty ? nil : lastName
         updatedContact.phoneEntries = buildPhoneEntries()

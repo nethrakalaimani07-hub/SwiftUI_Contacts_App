@@ -4,9 +4,6 @@
 //
 //  Created by Nethra Kalaimani on 03/11/26.
 //
-// Lets the user choose what happens when they tap, double tap, or long
-// press a row in the Favourites list. The choice is saved with
-// @AppStorage, so FavoritesView just reads the same three values.
 
 import SwiftUI
 

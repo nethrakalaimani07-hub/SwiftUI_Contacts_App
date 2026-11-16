@@ -34,10 +34,7 @@ struct AddNewContactView: View {
     @Environment(\.dismiss) private var dismiss
     
     private var initialsPreview: String {
-        let initials = "\(firstName.first ?? " ")\(lastName.first ?? " ")"
-                .trimmingCharacters(in: .whitespaces)
-                .uppercased()
-
+        let initials = String.contactInitials(firstName: firstName, lastName: lastName)
         return initials.isEmpty ? "?" : initials
     }
 

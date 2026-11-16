@@ -64,9 +64,7 @@ final class Contact: Identifiable {
     }
 
     var initials: String {
-        "\(firstName.first ?? " ")\(lastName?.first ?? " ")"
-                .trimmingCharacters(in: .whitespaces)
-                .uppercased()
+        String.contactInitials(firstName: firstName, lastName: lastName)
     }
 
     // The main phone number — the first one in the list

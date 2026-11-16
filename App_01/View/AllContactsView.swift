@@ -133,9 +133,14 @@ private struct ContactSectionRows: View {
             }
             .navigationLinkIndicatorVisibility(.hidden)
         } header: {
-            Text(letter)
-                .foregroundStyle(Color.appSecondaryText)
-                .textCase(nil)
+            if letter == ContactViewModel.emojiSectionKey {
+                Image(systemName: "sparkles")
+                    .foregroundStyle(Color.appSecondaryText)
+            } else {
+                Text(letter)
+                    .foregroundStyle(Color.appSecondaryText)
+                    .textCase(nil)
+            }
         }
     }
 }

@@ -22,9 +22,7 @@ struct FavouritesView: View {
     
     var body: some View {
         
-        // Favourites no longer get grouped alphabetically — the user's
-        // own drag order *is* the order, and alphabetical sections would
-        // fight with that, so this is one flat, reorderable list.
+       
         let filteredFavourites = viewModel.searchContacts(
             viewModel.favouriteContacts,
             matching: searchText
@@ -80,7 +78,7 @@ struct FavouritesView: View {
         }
         .gesture(
             MagnificationGesture()
-                .onEnded { scale in
+                .onChanged { scale in
                     if scale > 1 {
                         withAnimation {
                             zoomIn()

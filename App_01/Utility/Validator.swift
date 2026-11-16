@@ -9,10 +9,6 @@ import Foundation
 
 extension String {
 
-    var isValidName: Bool {
-        !trimmingCharacters(in: .whitespaces).isEmpty
-    }
-
     var isValidPhoneNumber: Bool {
         let trimmed = trimmingCharacters(in: .whitespaces)
         return trimmed.count == 10 && trimmed.allSatisfy { $0.isNumber }
@@ -53,5 +49,47 @@ extension String {
             }
 
             return false
+    }
+}
+
+
+
+extension String {
+
+    var isValidName: Bool {
+        !trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    
+    var startsWithEmoji: Bool {
+        first?.isEmoji ?? false
+    }
+
+    static func contactInitials(firstName: String, lastName: String?) -> String {
+        guard let firstChar = firstName.first else { return "" }
+
+        if firstChar.isEmoji {
+            return String(firstChar)
+        }
+
+        return "\(firstChar)\(lastName?.first ?? " ")"
+            .trimmingCharacters(in: .whitespaces)
+            .uppercased()
+    }
+}
+
+
+
+extension Character {
+
+
+    var isEmoji: Bool {
+        guard let firstScalar = unicodeScalars.first else { return false }
+
+        if unicodeScalars.count > 1 && firstScalar.properties.isEmoji {
+            return true
+        }
+
+        return firstScalar.properties.isEmoji && firstScalar.properties.isEmojiPresentation
     }
 }

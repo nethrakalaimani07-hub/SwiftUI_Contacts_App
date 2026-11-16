@@ -166,13 +166,11 @@ class ContactViewModel {
         }
     }
 
-    // Whether a contact is currently a favourite — used wherever we
-    // used to read contact.isFavourite directly.
     func isFavourite(id: UUID) -> Bool {
         _favouriteIDs.contains(id)
     }
 
-    // Reorders the favourites list. Used by FavouritesView's drag-to-reorder.
+    // Reorder, Used by FavouritesView's drag-to-reorder.
     func moveFavourite(from source: IndexSet, to destination: Int) {
         _favouriteIDs.move(fromOffsets: source, toOffset: destination)
     }
@@ -207,8 +205,7 @@ class ContactViewModel {
         tagViewModel.getTagById(withID: id)
     }
 
-    // Contacts marked as favourite, in the user's own chosen order —
-    // used by FavouritesView.
+
     var favouriteContacts: [Contact] {
         _favouriteIDs.compactMap { id in
             _contacts.first { $0.id == id }
@@ -248,23 +245,35 @@ class ContactViewModel {
         }
     }
 
+    static let emojiSectionKey = "✨"
+
     func groupedContacts(from items: [ContactListItem]) -> [String: [ContactListItem]] {
         var groups: [String: [ContactListItem]] = [:]
 
         for item in items {
-            let firstLetter = String(item.fullName.prefix(1)).uppercased()
-            groups[firstLetter, default: []].append(item)
+            let key: String
+            if item.fullName.startsWithEmoji {
+                key = ContactViewModel.emojiSectionKey
+            } else {
+                key = String(item.fullName.prefix(1)).uppercased()
+            }
+            groups[key, default: []].append(item)
         }
 
-        for letter in groups.keys {
-            groups[letter] = sortByFullName(groups[letter] ?? [])
+        for key in groups.keys {
+            groups[key] = sortByFullName(groups[key] ?? [])
         }
 
         return groups
     }
 
     func sectionLetters(for groups: [String: [ContactListItem]]) -> [String] {
-        groups.keys.sorted()
+
+        groups.keys.sorted { lhs, rhs in
+            if lhs == ContactViewModel.emojiSectionKey { return false }
+            if rhs == ContactViewModel.emojiSectionKey { return true }
+            return lhs < rhs
+        }
     }
 
     private func sortByFullName(_ items: [ContactListItem]) -> [ContactListItem] {
