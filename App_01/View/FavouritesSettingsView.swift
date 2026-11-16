@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-struct FavoritesSettingsView: View {
+struct FavouritesSettingsView: View {
 
     @AppStorage("favourites.tapAction") private var tapAction: RowTapAction = .call
     @AppStorage("favourites.doubleTapAction") private var doubleTapAction: RowTapAction = .copyPhoneNumber
@@ -53,7 +53,7 @@ struct FavoritesSettingsView: View {
 
             Section {
                 NavigationLink {
-                    FavoritesRowSettingsView()
+                    FavouritesRowSettingsView()
                 } label: {
                     Text("Choose What Shows in Each Row")
                 }
@@ -112,6 +112,6 @@ struct FavoritesSettingsView: View {
 
 #Preview {
     NavigationStack {
-        FavoritesSettingsView()
+        FavouritesSettingsView()
     }
 }

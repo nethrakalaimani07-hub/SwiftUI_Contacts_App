@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-struct FavoritesRowSettingsView: View {
+struct FavouritesRowSettingsView: View {
 
     @AppStorage("favourites.showAvatar") private var showAvatar = true
     @AppStorage("favourites.showPhoneText") private var showPhoneText = true
@@ -101,6 +101,6 @@ struct FavoritesRowSettingsView: View {
 
 #Preview {
     NavigationStack {
-        FavoritesRowSettingsView()
+        FavouritesRowSettingsView()
     }
 }

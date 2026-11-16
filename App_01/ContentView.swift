@@ -33,9 +33,9 @@ struct ContentView: View {
                 .id(allTabID)
             }
             
-            Tab("Favorites", systemImage: "star.fill", value: AppTab.favourites) {
+            Tab("Favourites", systemImage: "star.fill", value: AppTab.favourites) {
                 NavigationStack {
-                    FavoritesView()
+                    FavouritesView()
                 }
                 .tint(Color.appPrimary)
                 .id(favouritesTabID)

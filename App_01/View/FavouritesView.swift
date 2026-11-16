@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FavoritesView: View {
+struct FavouritesView: View {
     
     @Environment(ContactViewModel.self) private var viewModel
     
@@ -60,7 +60,7 @@ struct FavoritesView: View {
 
             ToolbarItem(placement: .topBarTrailing){
                 NavigationLink {
-                    FavoritesSettingsView()
+                    FavouritesSettingsView()
                 } label: {
                     Image(systemName: "gearshape")
                 }
@@ -247,6 +247,6 @@ private struct FavouriteRow: View {
 
 #Preview {
     NavigationStack {
-        FavoritesView()
+        FavouritesView()
     }
 }

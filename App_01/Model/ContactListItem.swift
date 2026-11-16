@@ -35,8 +35,7 @@ struct ContactListItem: Identifiable {
 }
 
 extension Contact {
-    // isFavourite isn't stored on Contact anymore — it's membership in
-    // ContactViewModel's favourites list, so the caller has to pass it in.
+    
     func listItem(isFavourite: Bool) -> ContactListItem {
         ContactListItem(
             id: id,
