@@ -10,12 +10,12 @@ import SwiftData
 @Observable
 class ContactTagViewModel {
 
-    static let friendTag = ContactTag("Friend")
-    static let workTag = ContactTag("Work")
-    static let homeTag = ContactTag("Home")
-    static let otherTag = ContactTag("Other")
-    static let mobileTag = ContactTag("Mobile")
-    static let familyTag = ContactTag("Family")
+//    static let friendTag = ContactTag("Friend")
+//    static let workTag = ContactTag("Work")
+//    static let homeTag = ContactTag("Home")
+//    static let otherTag = ContactTag("Other")
+//    static let mobileTag = ContactTag("Mobile")
+//    static let familyTag = ContactTag("Family")
 
 //    private var _tags: Set<ContactTag> = [
 //        ContactTagViewModel.friendTag,
