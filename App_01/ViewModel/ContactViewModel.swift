@@ -15,99 +15,18 @@ import SwiftData
 class ContactViewModel {
 
     private let tagViewModel = ContactTagViewModel()
-    
-    // The contacts list in the whole app
-    private var _contacts: [Contact] = []
+
+    // Favourites are still kept in memory (not SwiftData) — only the
+    // contacts list itself is persisted now.
     private var _favouriteIDs: [UUID] = []
 
-    init() {
-        _contacts.append(contentsOf: [Contact(
-            firstName: "Nethra",
-            lastName: "K",
-            email: "nethra.k@example.com",
-            phoneEntries: [
-                PhoneEntry(number: "+91 8428497598", tagID: ContactTagViewModel.mobileTag.id),
-                PhoneEntry(number: "+91 9876500011", tagID: ContactTagViewModel.workTag.id)
-            ],
-            address: "12 MG Road, Chennai",
-            note: "College friend, loves hiking.",
-            birthday: ContactViewModel.date(year: 1998, month: 5, day: 14),
-            additionalEmails: ["nethra.k@work.com"]
-        ),
+    // Adding, updating, deleting contacts (now via SwiftData)
 
-        Contact(
-            firstName: "Surya",
-            phoneEntries: [PhoneEntry(number: "+91 1234567890", tagID: ContactTagViewModel.mobileTag.id)]
-        ),
-
-        Contact(
-            firstName: "Sree",
-            lastName: "Y",
-            phoneEntries: [PhoneEntry(number: "+91 1234567890", tagID: ContactTagViewModel.mobileTag.id)]
-        ),
-
-        Contact(
-            firstName: "Dharshana",
-            lastName: "I",
-            email: "dharshana.i@example.com",
-            phoneEntries: [PhoneEntry(number: "+91 9876501234", tagID: ContactTagViewModel.mobileTag.id)],
-            address: "45 Anna Nagar, Madurai",
-            note: "Prefers calls over texts.",
-            birthday: ContactViewModel.date(year: 2000, month: 11, day: 2)
-        ),
-
-        Contact(
-            firstName: "Swathi",
-            lastName: "L",
-            email: "swathi.l@example.com",
-            phoneEntries: [PhoneEntry(number: "+91 9123456780", tagID: ContactTagViewModel.mobileTag.id)],
-            note: "Met at the design meetup.",
-            birthday: ContactViewModel.date(year: 1999, month: 8, day: 23),
-            additionalEmails: ["swathi.personal@example.com"]
-        ),
-
-        Contact(
-            firstName: "Arun",
-            lastName: "P",
-            phoneEntries: [PhoneEntry(number: "+91 9876543210", tagID: ContactTagViewModel.mobileTag.id)]
-        ),
-
-        Contact(
-            firstName: "Bala",
-            lastName: "M",
-            phoneEntries: [PhoneEntry(number: "+91 9988776655", tagID: ContactTagViewModel.mobileTag.id)]
-        ),
-
-        Contact(
-            firstName: "Nishanth",
-            lastName: "S A",
-            email: "nishanth.sa@example.com",
-            phoneEntries: [
-                PhoneEntry(number: "+91 9898776655", tagID: ContactTagViewModel.mobileTag.id),
-                PhoneEntry(number: "+91 9000011122", tagID: ContactTagViewModel.homeTag.id),
-                PhoneEntry(number: "+91 9000033344", tagID: ContactTagViewModel.workTag.id)
-            ],
-            address: "7 Lake View Street, Coimbatore",
-            birthday: ContactViewModel.date(year: 1997, month: 2, day: 9)
-        )])
-        
-        _favouriteIDs.append(contentsOf: [_contacts[0].id, _contacts[4].id, _contacts[7].id, _contacts[3].id] )
-    }
-
-    // Small helper just for building the birthday dates above
-    // without writing out DateComponents + Calendar every time.
-    private static func date(year: Int, month: Int, day: Int) -> Date {
-        var components = DateComponents()
-        components.year = year
-        components.month = month
-        components.day = day
-        return Calendar.current.date(from: components) ?? Date()
-    }
-    
-     var contacts : [Contact] {
-        _contacts
-    }
-
+    // Creates a new Contact and inserts it into SwiftData's
+    // ModelContext, so it's actually saved to disk instead of just
+    // living in memory. The View passes in its own `modelContext`
+    // (read via @Environment(\.modelContext)) since this view model
+    // doesn't have one of its own.
     func addContact(
         firstName: String,
         lastName: String?,
@@ -118,8 +37,9 @@ class ContactViewModel {
         birthday: Date? = nil,
         additionalEmails: [String] = [],
         profileImageData: Data? = nil,
-        isFavourite: Bool
-    ) throws -> Contact {
+        isFavourite: Bool,
+        context: ModelContext
+    ) throws {
         let newContact = Contact(
             firstName: firstName,
             lastName: lastName,
@@ -141,23 +61,38 @@ class ContactViewModel {
             newContact.profileImageFilename = fileName
         }
 
-        _contacts.append(newContact)
-        
+        // Old in-memory version: _contacts.append(newContact)
+        context.insert(newContact)
+
         if isFavourite {
             _favouriteIDs.append(newContact.id)
         }
-        
-        return newContact
+
     }
 
-    func updateContact(_ contact: Contact) {
-        guard let index = contacts.firstIndex(where: { $0.id == contact.id })
-              else { return }
-        _contacts[index] = contact
+    // Contact is a SwiftData @Model, which is a class — so a Contact
+    // you got from a @Query is already "live": changing its
+    // properties (like EditContactView does) already updates what
+    // will be saved. This just makes sure that change is written to
+    // disk right away instead of waiting for SwiftData's next
+    // autosave.
+    func updateContact(_ contact: Contact, context: ModelContext) {
+        // Old in-memory version:
+        // guard let index = contacts.firstIndex(where: { $0.id == contact.id })
+        //       else { return }
+        // _contacts[index] = contact
+        try? context.save()
     }
 
-    func deleteContact(id: UUID) {
-        _contacts.removeAll { $0.id == id }
+    // Needs the current contacts list (from @Query in the calling
+    // View) to find the one to delete, since this view model doesn't
+    // keep its own list any more.
+    func deleteContact(id: UUID, from contacts: [Contact], context: ModelContext) {
+        guard let contact = contacts.first(where: { $0.id == id }) else { return }
+
+        // Old in-memory version: _contacts.removeAll { $0.id == id }
+        context.delete(contact)
+
         _favouriteIDs.removeAll { $0 == id }
     }
 
@@ -179,39 +114,45 @@ class ContactViewModel {
     }
 
     // All tags, sorted alphabetically for picker display.
-    var tags: [ContactTag] {
-        tagViewModel.tags
+//    var tags: [ContactTag] {
+//        tagViewModel.tags
+//    }
+
+    func addTag(name: String, tags: [ContactTag], context: ModelContext) -> ContactTag {
+        tagViewModel.addTag(name: name, tags: tags, context: context)
     }
 
-    func addTag(name: String) -> ContactTag {
-        tagViewModel.addTag(name: name)
+    func renameTag(id: UUID, to newName: String, tags: [ContactTag], context: ModelContext) {
+        tagViewModel.renameTag(id: id, to: newName, tags: tags, context: context)
     }
 
-    func renameTag(id: UUID, to newName: String) {
-        tagViewModel.renameTag(id: id, to: newName)
-    }
+    // Needs the current contacts list passed in now (from @Query),
+    // to clear the deleted tag off any phone entry that used it.
+    // Contact is a class, so mutating phoneEntries here saves
+    // straight through to SwiftData.
+    func deleteTag(tag: ContactTag, in contacts: [Contact], context: ModelContext) {
+        tagViewModel.deleteTag(tag: tag, context: context)
 
-    func deleteTag(id: UUID) {
-        tagViewModel.deleteTag(id: id)
-
-        for contactIndex in _contacts.indices {
-            for phoneIndex in _contacts[contactIndex].phoneEntries.indices {
-                if _contacts[contactIndex].phoneEntries[phoneIndex].tagID == id {
-                    _contacts[contactIndex].phoneEntries[phoneIndex].tagID = nil
+        for contact in contacts {
+            for phoneIndex in contact.phoneEntries.indices {
+                if contact.phoneEntries[phoneIndex].tagID == tag.id {
+                    contact.phoneEntries[phoneIndex].tagID = nil
                 }
             }
         }
     }
 
     // Used to show a phone number's tag name.
-    func getTagbyId(withID id: UUID?) -> ContactTag? {
-        tagViewModel.getTagById(withID: id)
+    func getTagbyId(withID id: UUID?, tags: [ContactTag]) -> ContactTag? {
+        tagViewModel.getTagById(withID: id, tags: tags)
     }
 
-
-    var favouriteContacts: [Contact] {
+    // Contacts marked as favourite, in the user's own chosen order.
+    // Needs the full contacts list passed in now (from @Query in the
+    // View), since this view model no longer keeps its own list.
+    func favouriteContacts(from contacts: [Contact]) -> [Contact] {
         _favouriteIDs.compactMap { id in
-            _contacts.first { $0.id == id }
+            contacts.first { $0.id == id }
         }
     }
 
@@ -239,7 +180,7 @@ class ContactViewModel {
             if contact.additionalEmails.contains(where: { $0.localizedCaseInsensitiveContains(trimmedQuery) }) {
                 return true
             }
-            
+
             if let note = contact.note, note.localizedStandardContains(trimmedQuery) {
                 return true
             }
@@ -285,5 +226,3 @@ class ContactViewModel {
         }
     }
 }
-
-

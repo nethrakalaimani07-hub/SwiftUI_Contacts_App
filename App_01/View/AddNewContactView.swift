@@ -266,7 +266,7 @@ struct AddNewContactView: View {
         guard validate() else { return }
 
         do {
-            let newContact = try viewModel.addContact(
+            try viewModel.addContact(
                 firstName: firstName.trimmingCharacters(in: .whitespaces),
                 lastName: lastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : lastName,
                 phoneEntries: buildPhoneEntries(),
@@ -276,9 +276,9 @@ struct AddNewContactView: View {
                 birthday: birthday ?? nil,
                 additionalEmails: additionalEmails.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty },
                 profileImageData: profileImageData,
-                isFavourite: isFavourite
+                isFavourite: isFavourite,
+                context: context
             )
-            context.insert(newContact)
         } catch {
             print("Failed to save contact: \(error)")
         }

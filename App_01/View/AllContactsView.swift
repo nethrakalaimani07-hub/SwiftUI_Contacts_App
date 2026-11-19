@@ -11,6 +11,8 @@ import SwiftData
 struct AllContactsView: View {
     
     @Environment(ContactViewModel.self) private var viewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var contacts: [Contact]
     
     @State private var showingAddContact = false
     
@@ -25,12 +27,10 @@ struct AllContactsView: View {
 
     @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
     
-    // @Query var contactsQuery: [Contact]
-    
     var body: some View {
         
         let filteredContacts = viewModel.searchContacts(
-            viewModel.contacts,
+            contacts,
             matching: searchText
         )
         
@@ -56,7 +56,7 @@ struct AllContactsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Search name, phone, or email")
         .overlay {
-            if viewModel.contacts.isEmpty {
+            if contacts.isEmpty {
                 ContentUnavailableView(
                     "No Contacts",
                     systemImage: "person.crop.circle.badge.plus",
@@ -153,6 +153,8 @@ private struct ContactSectionRows: View {
 private struct ContactRow: View {
     let item: ContactListItem
     @Environment(ContactViewModel.self) private var viewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var contacts: [Contact]
 
     @State private var showingDeleteConfirmation = false
 
@@ -243,7 +245,7 @@ private struct ContactRow: View {
         ) {
             Button("Delete", role: .destructive) {
                 withAnimation {
-                    viewModel.deleteContact(id: item.id)
+                    viewModel.deleteContact(id: item.id, from: contacts, context: modelContext)
                 }
             }
             Button("Cancel", role: .cancel) {}

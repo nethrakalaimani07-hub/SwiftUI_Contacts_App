@@ -5,6 +5,7 @@
 
 import Foundation
 import Observation
+import SwiftData
 
 @Observable
 class ContactTagViewModel {
@@ -16,52 +17,49 @@ class ContactTagViewModel {
     static let mobileTag = ContactTag("Mobile")
     static let familyTag = ContactTag("Family")
 
-    private var _tags: Set<ContactTag> = [
-        ContactTagViewModel.friendTag,
-        ContactTagViewModel.workTag,
-        ContactTagViewModel.homeTag,
-        ContactTagViewModel.otherTag,
-        ContactTagViewModel.mobileTag,
-        ContactTagViewModel.familyTag
-    ]
+//    private var _tags: Set<ContactTag> = [
+//        ContactTagViewModel.friendTag,
+//        ContactTagViewModel.workTag,
+//        ContactTagViewModel.homeTag,
+//        ContactTagViewModel.otherTag,
+//        ContactTagViewModel.mobileTag,
+//        ContactTagViewModel.familyTag
+//    ]
 
     // All tags, sorted alphabetically for picker display.
-    var tags: [ContactTag] {
-        _tags.sorted { first, second in
-            return first.tagName < second.tagName
-        }
-    }
+//    var tags: [ContactTag] {
+//        _tags.sorted { first, second in
+//            return first.tagName < second.tagName
+//        }
+//    }
 
-    func addTag(name: String) -> ContactTag {
+    func addTag(name: String, tags: [ContactTag] ,context: ModelContext) -> ContactTag {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
 
-        if let existingTag = _tags.first(where: { $0.tagName.caseInsensitiveCompare(trimmedName) == .orderedSame }) {
+        if let existingTag = tags.first(where: { $0.tagName.caseInsensitiveCompare(trimmedName) == .orderedSame }) {
             return existingTag
         }
 
         let newTag = ContactTag(trimmedName)
-        _tags.insert(newTag)
+        context.insert(newTag)
         return newTag
     }
 
-    func renameTag(id: UUID, to newName: String) {
+    func renameTag(id: UUID, to newName: String, tags: [ContactTag], context: ModelContext) {
         let trimmedName = newName.trimmingCharacters(in: .whitespaces)
         guard !trimmedName.isEmpty,
-              let existingTag = _tags.first(where: { $0.id == id })
+              let existingTag = tags.first(where: { $0.id == id })
                 else { return }
 
-        _tags.remove(existingTag)
-        _tags.insert(ContactTag(id: id, trimmedName))
+        context.delete(existingTag)
+        context.insert(ContactTag(id: id, trimmedName))
     }
 
-    func deleteTag(id: UUID) {
-        guard let existingTag = _tags.first(where: { $0.id == id })
-                else { return }
-
-        _tags.remove(existingTag)
+    func deleteTag(tag: ContactTag, context: ModelContext) {
+        context.delete(tag)
     }
 
-    func getTagById(withID id: UUID?) -> ContactTag? {
+    func getTagById(withID id: UUID?, tags: [ContactTag]) -> ContactTag? {
         guard let id else { return nil }
         return tags.first { $0.id == id }
     }

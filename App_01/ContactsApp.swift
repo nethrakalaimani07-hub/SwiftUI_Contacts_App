@@ -17,7 +17,7 @@ struct ContactsApp: App {
             ContentView()
         }
         .environment(viewModel)
-        .modelContainer(for: Contact.self)
+        .modelContainer(for: [Contact.self, ContactTag.self])
         // retrival - @Environment(Type of the variable)
     }
 }

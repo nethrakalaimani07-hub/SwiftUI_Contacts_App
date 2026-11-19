@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct FavouritesView: View {
     
     @Environment(ContactViewModel.self) private var viewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var contacts: [Contact]
     
     @State private var searchText = ""
     
@@ -25,7 +28,7 @@ struct FavouritesView: View {
     var body: some View {
         
         let filteredFavourites = viewModel.searchContacts(
-            viewModel.favouriteContacts,
+            viewModel.favouriteContacts(from: contacts),
             matching: searchText
         )
         
@@ -51,7 +54,7 @@ struct FavouritesView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                if !viewModel.favouriteContacts.isEmpty {
+                if !viewModel.favouriteContacts(from: contacts).isEmpty {
                     EditButton()
                         .disabled(!searchText.isEmpty)
                 }
@@ -67,7 +70,7 @@ struct FavouritesView: View {
         }
         .searchable(text: $searchText ,prompt: "Search name, phone, or email")
         .overlay {
-            if viewModel.favouriteContacts.isEmpty {
+            if viewModel.favouriteContacts(from: contacts).isEmpty {
                 ContentUnavailableView(
                     "No Favourites",
                     systemImage: "star",
@@ -113,6 +116,8 @@ struct FavouritesView: View {
 private struct FavouriteRow: View {
     let item: ContactListItem
     @Environment(ContactViewModel.self) private var viewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var contacts: [Contact]
 
     @State private var showingDeleteConfirmation = false
 
@@ -203,7 +208,7 @@ private struct FavouriteRow: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                viewModel.deleteContact(id: item.id)
+                viewModel.deleteContact(id: item.id, from: contacts ,context: modelContext)
             }
             Button("Cancel", role: .cancel) {}
         }

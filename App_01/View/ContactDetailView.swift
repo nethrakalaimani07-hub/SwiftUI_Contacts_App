@@ -6,13 +6,18 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContactDetailView: View {
     
 
     let contactID: UUID
     @Environment(ContactViewModel.self) private var viewModel
-
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query private var contacts: [Contact]
+    @Query private var tags: [ContactTag]
+    
     @State private var showingEdit = false
     @State private var showingDeleteConfirm = false
     
@@ -21,7 +26,7 @@ struct ContactDetailView: View {
     @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
 
     private var contact: Contact? {
-        viewModel.contacts.first { $0.id == contactID }
+        contacts.first { $0.id == contactID }
     }
 
 
@@ -90,7 +95,7 @@ struct ContactDetailView: View {
                     
                     Section("Contact Info") {
                         ForEach(contact.phoneEntries) { entry in
-                            let label = viewModel.getTagbyId(withID: entry.tagID)?.tagName ?? "Phone"
+                            let label = viewModel.getTagbyId(withID: entry.tagID, tags: tags)?.tagName ?? "Phone"
                                 LabeledContent(label, value: entry.number)
                                 .onTapGesture {
                                     ContactAction.call(phoneNumber: entry.number)
@@ -162,7 +167,7 @@ struct ContactDetailView: View {
                 }
                 .alert("Delete \(contact.fullName)?", isPresented: $showingDeleteConfirm) {
                     Button("Delete", role: .destructive) {
-                        viewModel.deleteContact(id: contact.id)
+                        viewModel.deleteContact(id: contact.id, from: contacts , context: modelContext)
                         dismiss()
                     }
                     Button("Cancel", role: .cancel) {}
@@ -226,7 +231,8 @@ private struct ContactActionButton: View {
 
 #Preview {
     NavigationStack {
-        let viewModel = ContactViewModel()
-        ContactDetailView(contactID: viewModel.contacts[0].id)
+        ContactDetailView(contactID: UUID())
+            .environment(ContactViewModel())
+            .modelContainer(for: Contact.self, inMemory: true)
     }
 }

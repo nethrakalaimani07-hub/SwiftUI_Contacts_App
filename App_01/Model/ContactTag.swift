@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import SwiftData
 
-struct ContactTag: Identifiable, Equatable, Hashable {
-    let id: UUID
+@Model
+final class ContactTag: Identifiable, Equatable, Hashable {
+    private(set) var id: UUID
     var tagName: String
 
     init(id: UUID = UUID(), _ tagName: String) {

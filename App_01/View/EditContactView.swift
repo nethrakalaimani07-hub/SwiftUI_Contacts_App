@@ -7,13 +7,14 @@
 
 import SwiftUI
 import PhotosUI
+import SwiftData
 
 struct EditContactView: View {
 
     let contact: Contact
     @Environment(ContactViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
-
+    @Environment(\.modelContext) private var modelContext
 
     @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
 
@@ -283,15 +284,16 @@ struct EditContactView: View {
 
         updatedContact.profileImageData = profileImageData
 
-        viewModel.updateContact(updatedContact)
+        viewModel.updateContact(updatedContact, context: modelContext)
         dismiss()
     }
 }
 
-#Preview {
-    NavigationStack {
-        let viewModel = ContactViewModel()
-        EditContactView(contact: viewModel.contacts[0])
-            .environment(viewModel)
-    }
-}
+//
+//#Preview {
+//    NavigationStack {
+//        let viewModel = ContactViewModel()
+//        EditContactView(contact: viewModel.contacts[0])
+//            .environment(viewModel)
+//    }
+//}
