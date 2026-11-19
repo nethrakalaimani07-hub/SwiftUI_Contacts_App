@@ -84,5 +84,29 @@ struct ContactImageStorage {
     }
     
     
+    static func deleteImage(named fileName: String) throws {
+        let directoryURLs = fileManager.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        )
+        
+        guard let appSupportURL = directoryURLs.first else {
+            throw ContactImageStorageError.directoryUnavailable
+        }
+        
+        let photosDirectoryURL = appSupportURL.appendingPathComponent(
+            "ContactPhotos",
+            isDirectory: true
+        )
+        
+        let imageURL = photosDirectoryURL.appendingPathComponent(fileName)
+        guard fileManager.fileExists(atPath: imageURL.path) else {
+            throw ContactImageStorageError.imageFileNotFound
+        }
+        
+        try fileManager.removeItem(at: imageURL)
+    }
+    
+    
     
 }
