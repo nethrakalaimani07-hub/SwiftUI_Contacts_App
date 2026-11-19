@@ -14,6 +14,9 @@ struct EditContactView: View {
     @Environment(ContactViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
 
+
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
+
     @State private var firstName: String
     @State private var lastName: String
     @State private var email: String

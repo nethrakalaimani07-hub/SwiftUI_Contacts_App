@@ -7,8 +7,11 @@
 
 import SwiftUI
 import PhotosUI
+import SwiftData
 
 struct AddNewContactView: View {
+    
+    @Environment(\.modelContext) private var context
 
     @State private var firstName = ""
     @State private var lastName = ""
@@ -32,6 +35,8 @@ struct AddNewContactView: View {
 
     @Environment(ContactViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
+
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
     
     private var initialsPreview: String {
         let initials = String.contactInitials(firstName: firstName, lastName: lastName)
@@ -261,7 +266,7 @@ struct AddNewContactView: View {
         guard validate() else { return }
 
         do {
-            try viewModel.addContact(
+            let newContact = try viewModel.addContact(
                 firstName: firstName.trimmingCharacters(in: .whitespaces),
                 lastName: lastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : lastName,
                 phoneEntries: buildPhoneEntries(),
@@ -273,6 +278,7 @@ struct AddNewContactView: View {
                 profileImageData: profileImageData,
                 isFavourite: isFavourite
             )
+            context.insert(newContact)
         } catch {
             print("Failed to save contact: \(error)")
         }

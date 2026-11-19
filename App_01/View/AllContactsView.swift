@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AllContactsView: View {
     
@@ -20,6 +21,11 @@ struct AllContactsView: View {
     @AppStorage("allContacts.showFavouriteButton") private var showFavouriteButton = true
     @AppStorage("allContacts.showCallButton") private var showCallButton = true
     @AppStorage("allContacts.showEmailButton") private var showEmailButton = false
+
+
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
+    
+    // @Query var contactsQuery: [Contact]
     
     var body: some View {
         
@@ -42,7 +48,6 @@ struct AllContactsView: View {
                     items: groups[letter] ?? []
                 )
             }
-            
         }
         .scrollContentBackground(.hidden)
         .background(Color.customAppBackground)

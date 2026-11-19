@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import SwiftUI
+import SwiftData
 
 
 @Observable
@@ -118,7 +119,7 @@ class ContactViewModel {
         additionalEmails: [String] = [],
         profileImageData: Data? = nil,
         isFavourite: Bool
-    ) throws {
+    ) throws -> Contact {
         let newContact = Contact(
             firstName: firstName,
             lastName: lastName,
@@ -141,10 +142,12 @@ class ContactViewModel {
         }
 
         _contacts.append(newContact)
-
+        
         if isFavourite {
             _favouriteIDs.append(newContact.id)
         }
+        
+        return newContact
     }
 
     func updateContact(_ contact: Contact) {

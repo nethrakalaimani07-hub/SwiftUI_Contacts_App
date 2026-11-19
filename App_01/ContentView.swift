@@ -14,12 +14,16 @@ struct ContentView: View {
     private enum AppTab: Hashable {
         case all
         case favourites
+        case settings
     }
 
     @State private var selectedTab: AppTab = .all
     
     @State private var allTabID = UUID()
     @State private var favouritesTabID = UUID()
+    @State private var settingsTabID = UUID()
+
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
 
     var body: some View {
 
@@ -40,16 +44,27 @@ struct ContentView: View {
                 .tint(Color.appPrimary)
                 .id(favouritesTabID)
             }
+
+            Tab("Settings", systemImage: "gearshape.fill", value: AppTab.settings) {
+                NavigationStack {
+                    AppSettingsView()
+                }
+                .tint(Color.appPrimary)
+                .id(settingsTabID)
+            }
             
         }
         .tabBarMinimizeBehavior(.never)
         .tint(Color.appPrimary)
+        .id(selectedThemeRawValue)
         .onChange(of: selectedTab) { oldTab, newTab in
             switch oldTab {
             case .all:
                 allTabID = UUID()
             case .favourites:
                 favouritesTabID = UUID()
+            case .settings:
+                settingsTabID = UUID()
             }
         }
     }

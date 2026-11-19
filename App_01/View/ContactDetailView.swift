@@ -18,6 +18,8 @@ struct ContactDetailView: View {
     
     @Environment(\.dismiss) private var dismiss
 
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
+
     private var contact: Contact? {
         viewModel.contacts.first { $0.id == contactID }
     }
@@ -148,13 +150,6 @@ struct ContactDetailView: View {
                 .navigationTitle(contact.fullName)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                        
-//                        ShareLink(
-//                            item: shareText(for: contact)
-//                        ) {
-//                            Image(systemName: "square.and.arrow.up")
-//                        }
-                        
                     Button("Edit", systemImage: "pencil") {
                         showingEdit = true
                     }
@@ -215,14 +210,14 @@ private struct ContactActionButton: View {
                         : Color.appPrimary
                     )
                     .clipShape(Circle())
-
-
+                
+                
                 Text(title)
                     .font(.caption)
                     .foregroundColor(isDisabled
                                      ? Color.appSecondaryText
                                      : Color.appPrimary
-                                    )
+                    )
             }
         }
         .disabled(isDisabled)

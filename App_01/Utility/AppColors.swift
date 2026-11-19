@@ -7,23 +7,34 @@
 
 import SwiftUI
 
+// All the colors are computed values
 extension Color {
     
-    // Backgrounds
-    
-    static let customAppBackground = Color("AppBackground")
-    static let appSurface = Color("Surface")
+    static var customAppBackground: Color {
+        Color(AppTheme.current.backgroundColorName)
+    }
+    static var appSurface: Color {
+        Color(AppTheme.current.surfaceColorName)
+    }
 
-    // Accent Colors
-
-    static let appPrimary = Color("CustomPrimary")
-    static let appSecondary = Color("CustomSecondary")
+    static var appPrimary: Color {
+        Color(AppTheme.current.primaryColorName)
+    }
+    static var appSecondary: Color {
+        Color(AppTheme.current.secondaryColorName)
+    }
 
     // Text Colors
 
-    static let appText = Color("Text")
-    static let appSecondaryText = Color("Subtext")
+    static var appText: Color {
+        Color(AppTheme.current.textColorName)
+    }
+    static var appSecondaryText: Color {
+        Color(AppTheme.current.subtextColorName)
+    }
     
-    static let customAvatarText = Color("AvatarText")
+    static var customAvatarText: Color {
+        Color(AppTheme.current.avatarTextColorName)
+    }
     
 }

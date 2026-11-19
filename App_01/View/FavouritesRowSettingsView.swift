@@ -13,6 +13,8 @@ struct FavouritesRowSettingsView: View {
     @AppStorage("favourites.showCallButton") private var showCallButton = true
     @AppStorage("favourites.showEmailButton") private var showEmailButton = false
 
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
+
     var body: some View {
         Form {
             Section {

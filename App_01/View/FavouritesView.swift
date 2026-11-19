@@ -19,10 +19,11 @@ struct FavouritesView: View {
     @AppStorage("favourites.showFavouriteButton") private var showFavouriteButton = true
     @AppStorage("favourites.showCallButton") private var showCallButton = true
     @AppStorage("favourites.showEmailButton") private var showEmailButton = false
+
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
     
     var body: some View {
         
-       
         let filteredFavourites = viewModel.searchContacts(
             viewModel.favouriteContacts,
             matching: searchText

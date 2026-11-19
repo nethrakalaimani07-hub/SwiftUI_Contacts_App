@@ -13,6 +13,8 @@ struct AllContactsRowSettingsView: View {
     @AppStorage("allContacts.showCallButton") private var showCallButton = true
     @AppStorage("allContacts.showEmailButton") private var showEmailButton = false
 
+    @AppStorage("selectedTheme") private var selectedThemeRawValue: String = AppTheme.classic.rawValue
+
     var body: some View {
         Form {
             Section {
