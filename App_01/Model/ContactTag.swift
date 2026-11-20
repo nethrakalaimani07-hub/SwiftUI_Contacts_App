@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class ContactTag: Identifiable, Equatable, Hashable {
+class ContactTag: Identifiable, Equatable, Hashable {
     private(set) var id: UUID
     var tagName: String
 

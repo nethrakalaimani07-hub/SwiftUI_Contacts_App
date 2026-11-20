@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Contact: Identifiable {
+class Contact: Identifiable {
     private(set) var id: UUID
     var firstName: String
     var lastName: String?

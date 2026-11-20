@@ -8,7 +8,7 @@ import SwiftData
 
 // Phone Entry = Phone number + Tag?
 @Model
-final class PhoneEntry: Identifiable, Equatable{
+class PhoneEntry: Identifiable, Equatable{
     private(set) var id: UUID
     var number: String
     var tagID: UUID?
