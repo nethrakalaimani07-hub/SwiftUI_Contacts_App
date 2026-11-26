@@ -15,7 +15,6 @@ import SwiftData
 class ContactViewModel {
 
     private let tagViewModel = ContactTagViewModel()
-
     private var _favouriteIDs: [UUID] = []
 
     private let dataActor: ContactDataActor
@@ -100,49 +99,75 @@ class ContactViewModel {
             id: newID,
             firstName: firstName,
             lastName: lastName,
-            email: email,
             phoneEntries: phoneEntries,
+            email: email,
             address: address,
             note: note,
             birthday: birthday,
             additionalEmails: additionalEmails,
-            profileImageData: nil
+            profileImageData: profileImageData
         )
 
-        if let profileImageData {
-            let fileName = try ContactImageStorage.saveImage(
-                profileImageData,
-                for: newContact.id
-            )
-
-            newContact.profileImageFilename = fileName
-        }
-
-        // _contacts.append(newContact)
-        context.insert(newContact)
-
         if isFavourite {
-            _favouriteIDs.append(newContact.id)
+            _favouriteIDs.append(newID)
         }
-
     }
 
-    func updateContact(_ contact: Contact, context: ModelContext) {
-        // guard let index = contacts.firstIndex(where: { $0.id == contact.id })
-        //       else { return }
-        // _contacts[index] = contact
-        try? context.save()
+    func updateContact(
+        id: UUID,
+        firstName: String,
+        lastName: String?,
+        phoneEntries: [PhoneEntry],
+        email: String?,
+        address: String?,
+        note: String?,
+        birthday: Date?,
+        additionalEmails: [String],
+        profileImageData: Data?
+    ) async throws {
+        try await dataActor.updateContact(
+            id: id,
+            firstName: firstName,
+            lastName: lastName,
+            phoneEntries: phoneEntries,
+            email: email,
+            address: address,
+            note: note,
+            birthday: birthday,
+            additionalEmails: additionalEmails,
+            profileImageData: profileImageData
+        )
     }
 
-    func deleteContact(id: UUID, from contacts: [Contact], context: ModelContext) {
-        guard let contact = contacts.first(where: { $0.id == id }) else { return }
-
-        // _contacts.removeAll { $0.id == id }
-        context.delete(contact)
+    func deleteContact(id: UUID) async throws {
+        try await dataActor.deleteContact(id: id)
 
         _favouriteIDs.removeAll { $0 == id }
     }
 
+    // FetchDescriptor examples: sort, filter, limit/offset
+
+    func contactsWithBirthday(context: ModelContext) -> [Contact] {
+        let descriptor = FetchDescriptor<Contact>(
+            predicate: #Predicate<Contact> { $0.birthday != nil },
+            sortBy: [SortDescriptor(\.birthday)]
+        )
+
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    // for limit and offset
+    func fetchContactsPage(context: ModelContext, limit: Int, offset: Int) -> [Contact] {
+        var descriptor = FetchDescriptor<Contact>(
+            sortBy: [SortDescriptor(\.firstName)]
+        )
+        descriptor.fetchLimit = limit
+        descriptor.fetchOffset = offset
+
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    
     func toggleFavourite(id: UUID) {
         if let index = _favouriteIDs.firstIndex(of: id) {
             _favouriteIDs.remove(at: index)
