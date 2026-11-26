@@ -127,6 +127,9 @@ private struct PhoneTagPickerSheet: View {
             }
             .tint(Color.appPrimary)
         }
+        .onDisappear {
+            try? context.save()
+        }
     }
     
     private var noTagRow: some View {

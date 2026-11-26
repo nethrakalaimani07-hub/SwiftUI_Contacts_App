@@ -167,7 +167,11 @@ struct ContactDetailView: View {
                 }
                 .alert("Delete \(contact.fullName)?", isPresented: $showingDeleteConfirm) {
                     Button("Delete", role: .destructive) {
-                        viewModel.deleteContact(id: contact.id, from: contacts , context: modelContext)
+                        // viewModel.deleteContact(id: contact.id, from: contacts, context: modelContext)
+                        let contactID = contact.id
+                        Task {
+                            try? await viewModel.deleteContact(id: contactID)
+                        }
                         dismiss()
                     }
                     Button("Cancel", role: .cancel) {}
@@ -226,13 +230,5 @@ private struct ContactActionButton: View {
             }
         }
         .disabled(isDisabled)
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ContactDetailView(contactID: UUID())
-            .environment(ContactViewModel())
-            .modelContainer(for: Contact.self, inMemory: true)
     }
 }

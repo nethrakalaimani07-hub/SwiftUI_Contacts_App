@@ -203,7 +203,9 @@ struct EditContactView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    saveChanges()
+                    Task {
+                        await saveChanges()
+                    }
                 }
             }
         }
@@ -268,23 +270,27 @@ struct EditContactView: View {
             return PhoneEntry(number: fullNumber, tagID: entry.tagID)
         }
     }
-
-    private func saveChanges() {
+    
+    private func saveChanges() async {
         guard validate() else { return }
 
-        let updatedContact = contact
-        updatedContact.firstName = firstName
-        updatedContact.lastName = lastName.isEmpty ? nil : lastName
-        updatedContact.phoneEntries = buildPhoneEntries()
-        updatedContact.email = email.isEmpty ? nil : email
-        updatedContact.address = address.isEmpty ? nil : address
-        updatedContact.note = note.isEmpty ? nil : note
-        updatedContact.birthday =  birthday ?? nil
-        updatedContact.additionalEmails = additionalEmails.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        do {
+            try await viewModel.updateContact(
+                id: contact.id,
+                firstName: firstName,
+                lastName: lastName.isEmpty ? nil : lastName,
+                phoneEntries: buildPhoneEntries(),
+                email: email.isEmpty ? nil : email,
+                address: address.isEmpty ? nil : address,
+                note: note.isEmpty ? nil : note,
+                birthday: birthday ?? nil,
+                additionalEmails: additionalEmails.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty },
+                profileImageData: profileImageData
+            )
+        } catch {
+            print("Failed to update contact: \(error)")
+        }
 
-        updatedContact.profileImageData = profileImageData
-
-        viewModel.updateContact(updatedContact, context: modelContext)
         dismiss()
     }
 }

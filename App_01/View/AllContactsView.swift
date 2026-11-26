@@ -241,8 +241,9 @@ private struct ContactRow: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                withAnimation {
-                    viewModel.deleteContact(id: item.id, from: contacts, context: modelContext)
+                // viewModel.deleteContact(id: item.id, from: contacts, context: modelContext)
+                Task {
+                    try? await viewModel.deleteContact(id: item.id)
                 }
             }
             Button("Cancel", role: .cancel) {}
