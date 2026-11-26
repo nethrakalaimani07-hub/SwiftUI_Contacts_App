@@ -53,10 +53,22 @@ class ContactTagViewModel {
 
         context.delete(existingTag)
         context.insert(ContactTag(id: id, trimmedName))
+        do {
+            try context.save()
+        }
+        catch {
+            context.rollback()
+        }
     }
 
     func deleteTag(tag: ContactTag, context: ModelContext) {
         context.delete(tag)
+        do {
+            try context.save()
+        }
+        catch {
+            context.rollback()
+        }
     }
 
     func getTagById(withID id: UUID?, tags: [ContactTag]) -> ContactTag? {

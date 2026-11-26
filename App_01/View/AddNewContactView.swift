@@ -199,7 +199,9 @@ struct AddNewContactView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    save()
+                    Task {
+                        await save()
+                    }
                 }
             }
         }
@@ -262,11 +264,11 @@ struct AddNewContactView: View {
         }
     }
 
-    private func save() {
+    private func save() async {
         guard validate() else { return }
 
         do {
-            try viewModel.addContact(
+            try await viewModel.addContact(
                 firstName: firstName.trimmingCharacters(in: .whitespaces),
                 lastName: lastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : lastName,
                 phoneEntries: buildPhoneEntries(),
@@ -276,20 +278,12 @@ struct AddNewContactView: View {
                 birthday: birthday ?? nil,
                 additionalEmails: additionalEmails.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty },
                 profileImageData: profileImageData,
-                isFavourite: isFavourite,
-                context: context
+                isFavourite: isFavourite
             )
         } catch {
             print("Failed to save contact: \(error)")
         }
         
         dismiss()
-    }
-}
-
-#Preview {
-    NavigationStack {
-        AddNewContactView()
-            .environment(ContactViewModel())
     }
 }

@@ -18,6 +18,70 @@ class ContactViewModel {
 
     private var _favouriteIDs: [UUID] = []
 
+    private let dataActor: ContactDataActor
+
+    init(dataActor: ContactDataActor) {
+        self.dataActor = dataActor
+    }
+    
+    // func addContact(
+    //     firstName: String,
+    //     lastName: String?,
+    //     phoneEntries: [PhoneEntry],
+    //     email: String?,
+    //     address: String? = nil,
+    //     note: String? = nil,
+    //     birthday: Date? = nil,
+    //     additionalEmails: [String] = [],
+    //     profileImageData: Data? = nil,
+    //     isFavourite: Bool,
+    //     context: ModelContext
+    // ) throws {
+    //     let newContact = Contact(
+    //         firstName: firstName,
+    //         lastName: lastName,
+    //         email: email,
+    //         phoneEntries: phoneEntries,
+    //         address: address,
+    //         note: note,
+    //         birthday: birthday,
+    //         additionalEmails: additionalEmails,
+    //         profileImageData: nil
+    //     )
+    //
+    //     if let profileImageData {
+    //         let fileName = try ContactImageStorage.saveImage(
+    //             profileImageData,
+    //             for: newContact.id
+    //         )
+    //
+    //         newContact.profileImageFilename = fileName
+    //     }
+    //
+    //     context.insert(newContact)
+    //
+    //     if isFavourite {
+    //         _favouriteIDs.append(newContact.id)
+    //     }
+    // }
+    //
+    // func updateContact(_ contact: Contact, context: ModelContext) {
+    //     try? context.save()
+    // }
+    //
+    // func deleteContact(id: UUID, from contacts: [Contact], context: ModelContext) {
+    //     guard let contact = contacts.first(where: { $0.id == id }) else { return }
+    //
+    //     if let fileName = contact.profileImageFilename {
+    //         try? ContactImageStorage.deleteImage(named: fileName)
+    //     }
+    //
+    //     context.delete(contact)
+    //
+    //     _favouriteIDs.removeAll { $0 == id }
+    // }
+
+   
     func addContact(
         firstName: String,
         lastName: String?,
@@ -28,10 +92,12 @@ class ContactViewModel {
         birthday: Date? = nil,
         additionalEmails: [String] = [],
         profileImageData: Data? = nil,
-        isFavourite: Bool,
-        context: ModelContext
-    ) throws {
-        let newContact = Contact(
+        isFavourite: Bool
+    ) async throws {
+        let newID = UUID()
+
+        try await dataActor.addContact(
+            id: newID,
             firstName: firstName,
             lastName: lastName,
             email: email,

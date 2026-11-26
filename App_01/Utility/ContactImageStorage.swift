@@ -7,7 +7,7 @@
 import UIKit
 import Foundation
 
-struct ContactImageStorage {
+nonisolated struct ContactImageStorage {
     
     enum ContactImageStorageError: Error {
         case invalidImageData

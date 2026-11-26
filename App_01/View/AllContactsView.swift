@@ -88,9 +88,6 @@ struct AllContactsView: View {
                 AddNewContactView()
             }
         }
-        .onAppear {
-//            ContactImageStorage().createDirectory()
-        }
         .gesture(
             MagnificationGesture()
                 .onEnded { scale in
